@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kuis Rebutan Tim</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏆</text></svg>">
+<style>
+  :root { --bg:#0f172a; --card:#1e293b; --line:#334155; --text:#f8fafc; --muted:#94a3b8; --gold:#f59e0b; --good:#16a34a; --bad:#dc2626; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--text); font-family:system-ui,"Segoe UI",sans-serif; min-height:100vh; }
+  [hidden] { display:none !important; }
+  .app { max-width:1100px; margin:0 auto; padding:16px; display:flex; flex-direction:column; gap:14px; }
+  header { display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap; }
+  h1 { margin:0; font-size:1.6rem; } h2 { margin:0 0 10px; font-size:1.15rem; }
+  .sub { color:var(--muted); font-size:.9rem; margin-top:2px; }
+  .join { display:flex; align-items:center; gap:12px; background:var(--card); border:1px solid var(--line); border-radius:16px; padding:10px 14px; }
+  .join .lbl { font-size:.72rem; color:var(--muted); text-transform:uppercase; letter-spacing:1px; }
+  .join .code { font-size:2rem; font-weight:900; letter-spacing:6px; color:var(--gold); line-height:1.1; }
+  .join img { width:92px; height:92px; background:#fff; border-radius:8px; padding:4px; }
+  .join .net { font-size:.78rem; color:var(--muted); max-width:170px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:18px; padding:18px; }
+  input, select, textarea { font:inherit; color:var(--text); background:#0b1220; border:1px solid var(--line); border-radius:10px; padding:9px 11px; }
+  textarea { width:100%; resize:vertical; min-height:56px; }
+  button { font:inherit; font-weight:800; border:0; border-radius:14px; padding:12px 20px; cursor:pointer; background:#334155; color:var(--text); transition:.08s; }
+  button:active { transform:scale(.97); } button:disabled { opacity:.35; cursor:not-allowed; }
+  .primary { background:var(--gold); color:#1a1300; font-size:1.1rem; }
+  .small { padding:6px 12px; font-size:.85rem; border-radius:10px; }
+  .danger { background:#7f1d1d; }
+  .controls { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+  .hint { color:var(--muted); font-size:.85rem; margin-top:8px; } .err { color:#fca5a5; font-weight:700; margin-top:8px; }
+  .grid3 { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+  .lt { border-radius:14px; padding:12px; color:#fff; text-align:center; } .lt .n { font-weight:800; font-size:1.05rem; } .lt .s, .lt .p { font-size:.82rem; opacity:.92; margin-top:3px; }
+  .A { background:linear-gradient(135deg,#e0455f,#a62a42); } .B { background:linear-gradient(135deg,#2d8cff,#1a58b8); } .C { background:linear-gradient(135deg,#16c784,#0e8a5d); }
+  .off { opacity:.35; filter:grayscale(.7); }
+  .settings { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px; }
+  .settings label { display:flex; flex-direction:column; gap:5px; font-weight:700; font-size:.88rem; } .settings label.chk { flex-direction:row; align-items:center; gap:8px; }
+  .qcard { background:#0b1220; border:1px solid var(--line); border-radius:14px; padding:12px; margin-bottom:10px; }
+  .qhead { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; font-weight:800; }
+  .orow { display:flex; align-items:center; gap:8px; margin-top:7px; } .orow input[type=text] { flex:1; min-width:0; } .orow input[type=radio] { width:20px; height:20px; accent-color:#22c55e; }
+  .orow .ltr { font-weight:900; width:1.2em; color:var(--gold); }
+  .qnum { color:var(--muted); font-weight:700; font-size:.9rem; }
+  .question { font-size:2rem; font-weight:800; line-height:1.3; margin:8px 0 14px; min-height:3.2rem; }
+  .opts { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px; }
+  .opt { display:flex; gap:12px; align-items:center; background:#0b1220; border:3px solid var(--line); border-radius:14px; padding:14px; font-size:1.25rem; font-weight:700; }
+  .opt b { color:var(--gold); font-size:1.5rem; } .opt.correct { border-color:#22c55e; background:#052e16; } .opt.wrong { border-color:#ef4444; background:#450a0a; }
+  .banner { font-size:1.35rem; font-weight:900; padding:14px 16px; border-radius:14px; background:#0b1220; border:2px solid var(--line); margin-bottom:14px; text-align:center; }
+  .banner.open { border-color:var(--gold); color:var(--gold); animation:pulse 1s infinite; } .banner.ans { border-color:#fff; }
+  @keyframes pulse { 50% { box-shadow:0 0 0 8px #f59e0b33; } }
+  .team { border-radius:18px; padding:16px 10px; text-align:center; color:#fff; border:3px solid transparent; transition:.15s; }
+  .team.turn { border-color:#fff; box-shadow:0 0 0 6px #ffffff44; transform:translateY(-4px); }
+  .team .nm { font-weight:800; font-size:1.1rem; word-break:break-word; } .team .sc { font-size:3rem; font-weight:900; line-height:1.1; } .team .pl { font-size:.8rem; opacity:.9; }
+  pre { font:inherit; font-size:1.3rem; line-height:1.8; margin:0 0 14px; white-space:pre-wrap; }
+  @media (max-width:700px) { .question { font-size:1.4rem; } .opts { grid-template-columns:1fr; } .team .sc { font-size:2.2rem; } h1 { font-size:1.25rem; } .grid3 { grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div><h1>🏆 Kuis Rebutan Tim</h1><div class="sub" id="sub"></div></div>
+    <div class="join">
+      <div><div class="lbl">Kode ruangan</div><div class="code" id="code">…</div><div class="net" id="net">Menyambungkan…</div></div>
+      <img id="qr" alt="QR" hidden>
+    </div>
+  </header>
+
+  <section id="lobby" style="display:flex;flex-direction:column;gap:14px">
+    <div class="card">
+      <h2>Tim yang bergabung</h2>
+      <div class="grid3" id="lobbyTeams"></div>
+      <div class="hint">Peserta scan QR di kanan atas, memilih Tim A/B/C, mengubah nama tim, dan memilih soundboard (hanya sekali).</div>
+    </div>
+    <div class="card">
+      <h2>Pengaturan</h2>
+      <div class="settings">
+        <label>Jumlah soal yang dimainkan <input type="number" id="setCount" min="1" step="1" placeholder="semua"></label>
+        <label>Poin jawaban benar <input type="number" id="setPoints" min="0" max="1000" step="1" value="10"></label>
+        <label>Cara memilih tim penjawab
+          <select id="setMode">
+            <option value="random">Soal 1 rebutan, berikutnya acak</option>
+            <option value="race">Rebutan di setiap soal</option>
+          </select></label>
+        <label class="chk"><input type="checkbox" id="setShuffle"> Acak urutan soal</label>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Soal pilihan ganda <span id="qCount" style="color:var(--muted);font-weight:500"></span></h2>
+      <div id="editor"></div>
+      <div class="controls"><button id="addQ">+ Tambah soal</button></div>
+      <div class="hint">Isi pertanyaan dan pilihan, lalu pilih bulatan di sebelah jawaban yang benar. Tiap soal boleh punya 2 sampai 5 pilihan.</div>
+    </div>
+    <div class="card">
+      <div class="controls"><button class="primary" id="startBtn">▶ Mulai Permainan</button><button id="musicBtn">🎵 Musik: Nyala</button></div>
+      <div class="err" id="startErr"></div>
+      <div class="hint" id="lobbyHint"></div>
+      <div class="hint" id="musicHint">Klik sekali di mana saja pada layar agar musik dan soundboard bisa berbunyi (aturan browser).</div>
+    </div>
+  </section>
+
+  <section class="card" id="game" hidden>
+    <div class="qnum" id="qnum"></div>
+    <div class="question" id="question"></div>
+    <div class="opts" id="opts"></div>
+    <div class="banner" id="banner"></div>
+    <div class="controls">
+      <button class="primary" id="beginBtn">🔔 Buka Buzzer</button>
+      <button class="primary" id="nextBtn">➡ Soal berikutnya</button>
+      <button id="skipBtn">⏭ Lewati</button>
+      <button id="musicBtn2">🎵 Musik: Nyala</button>
+    </div>
+    <div class="hint">Pintasan: Spasi = Buka buzzer / Soal berikutnya.</div>
+  </section>
+
+  <section class="card" id="end" hidden>
+    <h2>🏁 Permainan selesai</h2>
+    <pre id="ranking"></pre>
+    <button class="primary" id="againBtn">↺ Main Lagi</button>
+  </section>
+
+  <div class="grid3" id="teams"></div>
+</div>
+<audio id="bgmLobby" src="musik-lobby.mp3" loop preload="auto"></audio>
+<audio id="bgmGame" src="musik-game.mp3" loop preload="auto"></audio>
+
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<script>
+/* Mesin permainan kuis pilihan ganda: murni logika (tanpa DOM / jaringan). */
+function createEngine(rng, soundIds) {
+  rng = rng || Math.random;
+  soundIds = soundIds || [];
+  const TEAMS = ["A", "B", "C"];
+  const MAX_NAME = 20;
+  let questions = [];
+  const s = {
+    phase: "lobby",   // lobby | ready | open | answering | reveal | end
+    qi: -1,
+    scores: { A: 0, B: 0, C: 0 },
+    registered: [],
+    names: { A: "Tim A", B: "Tim B", C: "Tim C" },
+    sounds: { A: null, B: null, C: null },
+    settings: { mode: "random", points: 10 },   // mode: random | race
+    turn: null,       // tim yang sedang menjawab
+    how: null,        // buzz | random
+    lastTeam: null,   // tim yang terakhir menjawab
+    picked: null,     // indeks pilihan yang dijawab
+    result: null
+  };
+  const nm = (t) => s.names[t];
+
+  function setQuestions(list) { questions = list.slice(); }
+  function setSettings(o) {
+    if (o && (o.mode === "random" || o.mode === "race")) s.settings.mode = o.mode;
+    const p = Number(o && o.points);
+    if (Number.isFinite(p)) s.settings.points = Math.max(0, Math.min(1000, Math.round(p)));
+  }
+  function question() { return questions[s.qi] || null; }
+  function total() { return questions.length; }
+
+  function register(t) {
+    if (!TEAMS.includes(t)) return false;
+    if (!s.registered.includes(t)) s.registered.push(t);
+    return true;
+  }
+  function cleanName(v) {
+    return String(v == null ? "" : v).replace(/[\u0000-\u001f\u007f<>]/g, "").replace(/\s+/g, " ").trim().slice(0, MAX_NAME);
+  }
+  function setName(t, name) {
+    if (s.phase !== "lobby" || !s.registered.includes(t)) return false;
+    const n = cleanName(name);
+    if (!n) return false;
+    s.names[t] = n;
+    return true;
+  }
+  /* Mengembalikan "ok" atau alasan penolakan. */
+  function setSound(t, id) {
+    if (s.phase !== "lobby") return "Permainan sudah dimulai.";
+    if (!s.registered.includes(t)) return "Tim belum terdaftar.";
+    if (s.sounds[t]) return "Soundboard sudah dipilih dan tidak bisa diganti.";
+    if (!soundIds.includes(id)) return "Suara tidak dikenal.";
+    const owner = TEAMS.find((x) => s.sounds[x] === id);
+    if (owner) return "Suara itu sudah dipakai " + nm(owner) + ".";
+    s.sounds[t] = id;
+    return "ok";
+  }
+
+  function pickRandomTeam() {
+    let pool = s.registered.filter((t) => t !== s.lastTeam);
+    if (!pool.length) pool = s.registered.slice();
+    return pool[Math.floor(rng() * pool.length)];
+  }
+  function load() {
+    s.qi++;
+    s.picked = null; s.result = null;
+    if (s.qi >= questions.length) { s.phase = "end"; s.turn = null; s.how = null; return; }
+    if (s.settings.mode === "random" && s.qi > 0) { s.how = "random"; s.turn = pickRandomTeam(); }
+    else { s.how = "buzz"; s.turn = null; }
+    s.phase = "ready";
+  }
+
+  function start() {
+    if (s.phase !== "lobby") return false;
+    if (s.registered.length < 2 || questions.length === 0) return false;
+    s.scores = { A: 0, B: 0, C: 0 };
+    s.qi = -1; s.lastTeam = null;
+    load();
+    return true;
+  }
+  function next() { if (s.phase !== "reveal") return false; load(); return true; }
+  function begin() {
+    if (s.phase !== "ready") return false;
+    s.phase = s.how === "random" ? "answering" : "open";
+    return true;
+  }
+  function buzz(team) {
+    if (s.phase !== "open" || !s.registered.includes(team)) return false;
+    s.turn = team; s.phase = "answering";
+    return true;
+  }
+  function answer(team, idx) {
+    const q = question();
+    if (s.phase !== "answering" || team !== s.turn || !q) return false;
+    if (!Number.isInteger(idx) || idx < 0 || idx >= q.options.length) return false;
+    const ok = idx === q.correct;
+    if (ok) s.scores[team] += s.settings.points;
+    s.picked = idx;
+    s.result = { type: ok ? "correct" : "wrong", team };
+    s.lastTeam = team;
+    s.phase = "reveal";
+    return true;
+  }
+  function skip() {
+    if (!["ready", "open", "answering"].includes(s.phase)) return false;
+    s.result = { type: "skip" }; s.turn = null; s.phase = "reveal";
+    return true;
+  }
+  function reset() {
+    s.phase = "lobby"; s.qi = -1; s.scores = { A: 0, B: 0, C: 0 };
+    s.turn = null; s.how = null; s.lastTeam = null; s.picked = null; s.result = null;
+  }
+
+  function message() {
+    switch (s.phase) {
+      case "lobby": return "Menunggu permainan dimulai";
+      case "ready": return s.how === "random" ? nm(s.turn) + " mendapat giliran (acak). Dengarkan soal…" : "Dengarkan soal…";
+      case "open": return "REBUTAN! Tekan tombol sekarang!";
+      case "answering": return s.how === "random" ? nm(s.turn) + " mendapat giliran! Pilih jawabanmu!" : nm(s.turn) + " tercepat! Pilih jawabanmu!";
+      case "reveal":
+        if (s.result && s.result.type === "correct") return "✅ " + nm(s.result.team) + " benar! +" + s.settings.points;
+        if (s.result && s.result.type === "wrong") return "❌ " + nm(s.result.team) + " salah.";
+        return "Soal dilewati";
+      case "end": return "Permainan selesai";
+    }
+    return "";
+  }
+  function ranking() {
+    const rows = s.registered.map((t) => ({ team: t, name: nm(t), score: s.scores[t] }))
+      .sort((a, b) => b.score - a.score || a.team.localeCompare(b.team));
+    let rank = 0, prev = null;
+    rows.forEach((r, i) => { if (r.score !== prev) { rank = i + 1; prev = r.score; } r.rank = rank; });
+    return rows;
+  }
+
+  return {
+    s, TEAMS, MAX_NAME, setQuestions, setSettings, question, total, register, setName, setSound,
+    start, next, begin, buzz, answer, skip, reset, message, ranking,
+    snapshot: () => JSON.parse(JSON.stringify(s)),
+    restore: (o) => { Object.assign(s, o); s.settings = Object.assign({ mode: "random", points: 10 }, o.settings || {}); }
+  };
+}
+</script>
+<script>
+(() => {
+  "use strict";
+  const PREFIX = "kuis3tim-";
+  const STORE = "q3_host_v2";
+  const ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  const SFX_SECONDS = 5;
+  const LOBBY_VOL = 0.35, GAME_VOL = 0.25;
+  const SOUNDS = [
+    { id: "bus",  label: "Klakson Bus",       file: "bus-honk-meme.mp3" },
+    { id: "raja", label: "Raja & Ratu Masuk", file: "king-queen-entrance.mp3" },
+    { id: "rizz", label: "Rizzz",             file: "the-weeknd-rizzz.mp3" },
+    { id: "bel",  label: "Bel Pintu",         file: "ring-doorbell-sound-mp3.mp3" },
+    { id: "gong", label: "Gong",              file: "shinese-gong.mp3" },
+    { id: "pipa", label: "Pipa Logam",        file: "metal-pipe-clang.mp3" },
+    { id: "hp",   label: "HP Berdering",      file: "yo-phone-is-ringing-your-phone-was-ringing.mp3" }
+  ];
+  const DEFAULT_QS = [
+    { q: "Apa yang dimaksud dengan personalisasi dalam bisnis?", options: ["Menawarkan produk yang sama kepada seluruh pelanggan.", "Menyajikan produk, konten, atau layanan yang relevan dengan kebutuhan pelanggan.", "Membatasi pelanggan dalam memilih produk.", "Memberikan promosi tanpa melihat kebutuhan pelanggan."], correct: 1 },
+    { q: "Pengalaman pelanggan (Customer Experience/CX) merupakan...", options: ["Perasaan dan penilaian pelanggan secara keseluruhan dari awal hingga akhir.", "Jumlah produk yang dibeli pelanggan dalam satu transaksi.", "Proses perusahaan dalam menentukan harga produk.", "Cara perusahaan meningkatkan jumlah iklan."], correct: 0 },
+    { q: "Mengapa personalisasi menjadi penggerak utama pengalaman pelanggan?", options: ["Karena personalisasi dapat menggantikan kualitas produk.", "Karena personalisasi membuat pelanggan selalu membeli produk.", "Karena personalisasi membantu pelanggan menemukan kebutuhan dan mengurangi langkah yang tidak perlu.", "Karena personalisasi hanya berfokus pada promosi."], correct: 2 },
+    { q: "Apa perbedaan utama antara segmentasi dan personalisasi?", options: ["Segmentasi mengelompokkan pelanggan berdasarkan kesamaan, sedangkan personalisasi menyesuaikan layanan untuk individu berdasarkan data.", "Segmentasi dilakukan secara individu, sedangkan personalisasi dilakukan secara kelompok.", "Segmentasi hanya dilakukan di toko offline, sedangkan personalisasi hanya dilakukan di toko online.", "Segmentasi dan personalisasi memiliki arti yang sama."], correct: 0 },
+    { q: "Contoh penerapan segmentasi pelanggan adalah...", options: ["Menampilkan rekomendasi produk berdasarkan riwayat belanja.", "Memberikan promo khusus mahasiswa.", "Mengirim panduan penggunaan produk.", "Menyesuaikan rekomendasi berdasarkan lokasi pelanggan."], correct: 1 },
+    { q: "Apa yang dimaksud dengan kustomisasi?", options: ["Sistem secara otomatis menentukan kebutuhan pelanggan.", "Perusahaan mengelompokkan pelanggan berdasarkan kesamaan.", "Pelanggan mengatur sendiri keinginannya, seperti ukuran, warna, atau kadar gula.", "Perusahaan memberikan produk yang sama kepada semua pelanggan."], correct: 2 },
+    { q: "Data apa yang termasuk dalam data perilaku pelanggan?", options: ["Preferensi rasa dan kategori favorit.", "Lokasi pengguna dan perangkat yang digunakan.", "Riwayat keluhan dan permintaan bantuan.", "Produk yang dilihat dan waktu kunjungan."], correct: 3 },
+    { q: "Riwayat pembelian dan nilai transaksi pelanggan termasuk jenis data...", options: ["Data konteks.", "Data perilaku.", "Data transaksi.", "Data layanan."], correct: 2 },
+    { q: "Mengapa bisnis perlu menggunakan data pelanggan secara bijak?", options: ["Agar bisnis dapat mengumpulkan sebanyak mungkin data pelanggan.", "Agar pelanggan tidak perlu mengetahui penggunaan datanya.", "Agar kepercayaan pelanggan tetap terjaga dan data digunakan sesuai kebutuhan.", "Agar semua data pelanggan dapat digunakan untuk promosi."], correct: 2 },
+    { q: "Contoh personalisasi dalam bisnis E-Commerce adalah...", options: ["Menampilkan rekomendasi produk dan voucher yang relevan untuk mempercepat pencarian.", "Menampilkan semua produk tanpa pengelompokan.", "Mengirim pesan promosi yang sama kepada seluruh pelanggan.", "Menghapus riwayat pembelian pelanggan."], correct: 0 },
+    { q: "Pada tahap “Mempertimbangkan” dalam peta perjalanan pelanggan, personalisasi dapat dilakukan dengan cara...", options: ["Mengirim pengingat pengisian ulang produk.", "Menyediakan filter pintar dan perbandingan produk yang mudah.", "Memberikan panduan penggunaan setelah pembelian.", "Menampilkan konten edukasi dan produk awal yang relevan."], correct: 1 },
+    { q: "Strategi personalisasi yang bertujuan mengurangi beban pikiran pelanggan saat memilih produk adalah...", options: ["Pahami kebutuhan nyata.", "Sesuaikan konteks.", "Berikan kendali penuh.", "Sederhanakan pilihan."], correct: 3 },
+    { q: "Manakah contoh personalisasi yang buruk?", options: ["Membatasi frekuensi pesan agar pelanggan tetap nyaman.", "Menyesuaikan rekomendasi dengan kebutuhan pelanggan.", "Mengirim pesan berlebihan hingga terasa seperti spam.", "Menjelaskan penggunaan data pelanggan secara transparan."], correct: 2 },
+    { q: "Apa yang digunakan untuk mengukur tingkat kepuasan pelanggan setelah berinteraksi dengan layanan?", options: ["Net Promoter Score (NPS).", "Customer Satisfaction (CSAT).", "Conversion Rate.", "Churn Rate."], correct: 1 },
+    { q: "Apa tujuan utama personalisasi dalam bisnis?", options: ["Menambah jumlah promosi sebanyak mungkin.", "Mengumpulkan data pelanggan sebanyak mungkin.", "Membuat pelanggan membeli produk dengan cepat tanpa mempertimbangkan kebutuhan.", "Membantu pelanggan, bukan sekadar menambah promosi."], correct: 3 }
+  ];
+  const MAX_Q = 100, MAX_OPT = 5, MIN_OPT = 2;
+
+  const $ = (id) => document.getElementById(id);
+  const E = createEngine(null, SOUNDS.map((s) => s.id));
+  const conns = new Map();          // koneksi -> { team }
+  let code = "", peer = null;
+  let Qs = [], settings = { count: "", points: 10, mode: "random", shuffle: false };
+  let musicOn = true, ducking = false, audioCtx = null;
+
+  /* ---------- Penyimpanan ---------- */
+  function loadStore() { try { return JSON.parse(localStorage.getItem(STORE)) || {}; } catch { return {}; } }
+  let playlist = [];
+  function save() {
+    try { localStorage.setItem(STORE, JSON.stringify({ code, qs: Qs, set: settings, playlist, snap: E.snapshot(), music: musicOn })); } catch { /* abaikan */ }
+  }
+  function randomCode() {
+    let c = "";
+    for (let i = 0; i < 5; i++) c += ALPHABET[Math.floor(Math.random() * ALPHABET.length)];
+    return c;
+  }
+  const soundLabel = (id) => { const s = SOUNDS.find((x) => x.id === id); return s ? s.label : ""; };
+
+  /* ---------- Editor soal ---------- */
+  function blankQ() { return { q: "", options: ["", "", "", ""], correct: 0 }; }
+  function sanitizeQs(list) {
+    if (!Array.isArray(list)) return [];
+    return list.slice(0, MAX_Q).map((x) => {
+      const opts = Array.isArray(x && x.options) ? x.options.slice(0, MAX_OPT).map((o) => String(o)) : ["", ""];
+      while (opts.length < MIN_OPT) opts.push("");
+      const correct = Number.isInteger(x && x.correct) && x.correct >= 0 && x.correct < opts.length ? x.correct : 0;
+      return { q: String((x && x.q) || ""), options: opts, correct };
+    });
+  }
+  function el(tag, props, ...kids) {
+    const e = document.createElement(tag);
+    const { style, ...rest } = props || {};
+    Object.assign(e, rest);
+    if (style) Object.assign(e.style, style);
+    e.append(...kids);
+    return e;
+  }
+  function renderEditor() {
+    $("qCount").textContent = "(" + Qs.length + " soal)";
+    $("editor").replaceChildren(...Qs.map((item, i) => {
+      const qInput = el("textarea", { value: item.q, placeholder: "Tulis pertanyaan…", rows: 2 });
+      qInput.addEventListener("input", () => { item.q = qInput.value; save(); });
+      const del = el("button", { className: "small danger", textContent: "🗑 Hapus" });
+      del.addEventListener("click", () => { Qs.splice(i, 1); save(); renderEditor(); });
+      const rows = item.options.map((opt, j) => {
+        const radio = el("input", { type: "radio", name: "correct-" + i, checked: item.correct === j, title: "Jawaban benar" });
+        radio.addEventListener("change", () => { item.correct = j; save(); });
+        const txt = el("input", { type: "text", value: opt, placeholder: "Pilihan " + String.fromCharCode(65 + j), maxLength: 120 });
+        txt.addEventListener("input", () => { item.options[j] = txt.value; save(); });
+        const row = el("div", { className: "orow" }, radio, el("span", { className: "ltr", textContent: String.fromCharCode(65 + j) }), txt);
+        if (item.options.length > MIN_OPT) {
+          const rm = el("button", { className: "small", textContent: "✕", title: "Hapus pilihan" });
+          rm.addEventListener("click", () => {
+            item.options.splice(j, 1);
+            if (item.correct === j) item.correct = 0; else if (item.correct > j) item.correct--;
+            save(); renderEditor();
+          });
+          row.append(rm);
+        }
+        return row;
+      });
+      const kids = [el("div", { className: "qhead" }, el("span", { textContent: "Soal " + (i + 1) }), del), qInput, ...rows];
+      if (item.options.length < MAX_OPT) {
+        const add = el("button", { className: "small", textContent: "+ Pilihan", style: { marginTop: "8px" } });
+        add.addEventListener("click", () => { item.options.push(""); save(); renderEditor(); });
+        kids.push(add);
+      }
+      return el("div", { className: "qcard" }, ...kids);
+    }));
+  }
+  /* Memvalidasi daftar soal; mengembalikan { list } atau { error }. */
+  function cleanQuestions(src) {
+    const list = [];
+    for (let i = 0; i < src.length; i++) {
+      const item = src[i], n = i + 1;
+      const q = item.q.trim();
+      if (!q) return { error: "Soal " + n + ": pertanyaan masih kosong." };
+      const opts = [];
+      let correct = -1;
+      item.options.forEach((o, j) => {
+        const t = o.trim();
+        if (!t) return;
+        if (j === item.correct) correct = opts.length;
+        opts.push(t);
+      });
+      if (opts.length < MIN_OPT) return { error: "Soal " + n + ": isi minimal 2 pilihan." };
+      if (correct < 0) return { error: "Soal " + n + ": pilihan yang ditandai benar masih kosong." };
+      list.push({ q, options: opts, correct });
+    }
+    if (!list.length) return { error: "Tambahkan minimal satu soal." };
+    return { list };
+  }
+  function shuffled(list) {
+    const a = list.slice();
+    for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+    return a;
+  }
+
+  /* ---------- Suara ---------- */
+  function beep(freq, dur) {
+    try {
+      audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+      const osc = audioCtx.createOscillator(), gain = audioCtx.createGain();
+      osc.frequency.value = freq; osc.type = "square"; gain.gain.value = 0.08;
+      osc.connect(gain); gain.connect(audioCtx.destination);
+      osc.start(); osc.stop(audioCtx.currentTime + dur);
+    } catch { /* suara tidak wajib */ }
+  }
+  function playTeamSound(team) {
+    const entry = SOUNDS.find((s) => s.id === E.s.sounds[team]);
+    if (!entry) { beep(880, 0.35); return; }
+    try {
+      const a = new Audio(entry.file);
+      a.volume = 1;
+      const p = a.play();
+      if (p && p.catch) p.catch(() => {});
+      ducking = true; applyVolumes();
+      setTimeout(() => { try { a.pause(); } catch { /* abaikan */ } ducking = false; applyVolumes(); }, SFX_SECONDS * 1000);
+    } catch { /* abaikan */ }
+  }
+
+  /* ---------- Musik latar (lobby & permainan) ---------- */
+  let unlocked = false;
+  function wantedTrack() {
+    if (!musicOn) return null;
+    const p = E.s.phase;
+    return p === "lobby" || p === "end" ? "lobby" : "game";
+  }
+  function applyVolumes() {
+    const f = ducking ? 0.35 : 1;
+    const l = $("bgmLobby"), g = $("bgmGame");
+    if (l) l.volume = LOBBY_VOL * f;
+    if (g) g.volume = GAME_VOL * f;
+  }
+  function tryPlay(a) {
+    const p = a.play();
+    if (p && p.then) p.then(() => { unlocked = true; $("musicHint").hidden = true; }).catch(() => {});
+  }
+  function syncMusic() {
+    const want = wantedTrack();
+    applyVolumes();
+    [["lobby", $("bgmLobby")], ["game", $("bgmGame")]].forEach(([k, a]) => {
+      if (!a) return;
+      if (k === want) { if (a.paused) { if (k === "game") a.currentTime = 0; tryPlay(a); } }
+      else if (!a.paused) { a.pause(); if (k === "game") a.currentTime = 0; }
+    });
+    const label = musicOn ? "🎵 Musik: Nyala" : "🔇 Musik: Mati";
+    $("musicBtn").textContent = label; $("musicBtn2").textContent = label;
+  }
+  function toggleMusic() { musicOn = !musicOn; save(); syncMusic(); }
+
+  /* ---------- Jaringan ---------- */
+  function counts() {
+    const c = { A: 0, B: 0, C: 0 };
+    conns.forEach((info, conn) => { if (info.team && conn.open) c[info.team]++; });
+    return c;
+  }
+  function publicState() {
+    const q = E.question(), s = E.s, c = counts();
+    const inGame = ["ready", "open", "answering", "reveal"].includes(s.phase);
+    return {
+      phase: s.phase, qNum: s.qi + 1, total: E.total(),
+      question: q && inGame ? { q: q.q, options: q.options } : null,
+      correct: q && s.phase === "reveal" ? q.correct : null,
+      picked: s.phase === "reveal" ? s.picked : null,
+      turn: s.turn, how: s.how, scores: s.scores, names: s.names, sounds: s.sounds,
+      points: s.settings.points, message: E.message(),
+      teams: Object.fromEntries(E.TEAMS.map((t) => [t, { registered: s.registered.includes(t), players: c[t] }])),
+      ranking: s.phase === "end" ? E.ranking() : []
+    };
+  }
+  function broadcast() {
+    const st = publicState();
+    conns.forEach((info, conn) => { if (conn.open) { try { conn.send({ type: "state", s: st, you: info.team || null }); } catch { /* abaikan */ } } });
+  }
+  function notice(conn, text) { try { conn.send({ type: "notice", text }); } catch { /* abaikan */ } }
+  function onMessage(conn, m) {
+    if (!m || typeof m !== "object") return;
+    const info = conns.get(conn);
+    if (m.type === "join") {
+      if (!E.TEAMS.includes(m.team)) return;
+      conns.set(conn, { team: m.team });
+      E.register(m.team);
+      update();
+    } else if (!info || !info.team) {
+      return;
+    } else if (m.type === "rename") {
+      if (!E.setName(info.team, m.name)) notice(conn, "Nama tidak bisa diubah sekarang.");
+      update();
+    } else if (m.type === "sound") {
+      const r = E.setSound(info.team, m.id);
+      if (r !== "ok") notice(conn, r);
+      update();
+    } else if (m.type === "buzz") {
+      if (E.buzz(info.team)) { playTeamSound(info.team); update(); }
+    } else if (m.type === "answer") {
+      if (E.answer(info.team, m.index)) { beep(E.s.result.type === "correct" ? 990 : 200, 0.3); update(); }
+    }
+  }
+  function startPeer() {
+    peer = new Peer(PREFIX + code);
+    peer.on("open", () => { $("net").textContent = "Siap. Menunggu HP tim…"; showQr(); });
+    peer.on("connection", (conn) => {
+      conns.set(conn, { team: null });
+      conn.on("data", (m) => onMessage(conn, m));
+      conn.on("close", () => { conns.delete(conn); update(); });
+      conn.on("error", () => { conns.delete(conn); update(); });
+      conn.on("open", () => update());
+    });
+    peer.on("error", (err) => {
+      if (err.type === "unavailable-id") { code = randomCode(); $("code").textContent = code; peer.destroy(); startPeer(); return; }
+      $("net").textContent = "Gangguan jaringan: " + err.type;
+    });
+    peer.on("disconnected", () => { try { peer.reconnect(); } catch { /* abaikan */ } });
+  }
+  function showQr() {
+    const url = new URL("play.html", location.href);
+    url.searchParams.set("code", code);
+    const img = $("qr");
+    img.onerror = () => { img.hidden = true; };
+    img.onload = () => { img.hidden = false; };
+    img.src = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" + encodeURIComponent(url.href);
+  }
+
+  /* ---------- Tampilan ---------- */
+  function teamBox(t, c, inGame) {
+    const s = E.s, reg = s.registered.includes(t);
+    const box = el("div", { className: "team " + t + (reg ? "" : " off") + (s.turn === t && inGame ? " turn" : "") },
+      el("div", { className: "nm", textContent: s.names[t] }),
+      el("div", { className: "sc", textContent: s.scores[t] }),
+      el("div", { className: "pl", textContent: reg ? c[t] + " HP" : "belum masuk" }));
+    return box;
+  }
+  function render() {
+    const s = E.s, q = E.question(), c = counts();
+    const inGame = ["ready", "open", "answering", "reveal"].includes(s.phase);
+    $("lobby").hidden = s.phase !== "lobby";
+    $("game").hidden = !inGame;
+    $("end").hidden = s.phase !== "end";
+    $("teams").hidden = s.phase === "lobby";
+    $("code").textContent = code;
+    const total = c.A + c.B + c.C;
+    $("net").textContent = total ? total + " HP terhubung" : "Menunggu HP tim…";
+    $("sub").textContent = inGame ? "Soal " + (s.qi + 1) + " dari " + E.total() : s.phase === "end" ? "Selesai" : "Rebut tombol, jawab dengan benar!";
+
+    if (s.phase === "lobby") {
+      $("lobbyTeams").replaceChildren(...E.TEAMS.map((t) => {
+        const reg = s.registered.includes(t);
+        return el("div", { className: "lt " + t + (reg ? "" : " off") },
+          el("div", { className: "n", textContent: s.names[t] }),
+          el("div", { className: "s", textContent: reg ? (s.sounds[t] ? "🔊 " + soundLabel(s.sounds[t]) : "memilih soundboard…") : "belum masuk" }),
+          el("div", { className: "p", textContent: reg ? c[t] + " HP" : "" }));
+      }));
+      const waiting = s.registered.filter((t) => !s.sounds[t]).map((t) => s.names[t]);
+      $("startBtn").disabled = s.registered.length < 2;
+      $("lobbyHint").textContent = s.registered.length < 2
+        ? "Menunggu minimal 2 tim bergabung (" + s.registered.length + " tim masuk)."
+        : s.registered.length + " tim siap." + (waiting.length ? " Belum memilih soundboard: " + waiting.join(", ") + "." : "");
+    }
+    if (inGame && q) {
+      $("qnum").textContent = "SOAL " + (s.qi + 1) + " / " + E.total();
+      $("question").textContent = q.q;
+      $("opts").replaceChildren(...q.options.map((o, i) => {
+        const reveal = s.phase === "reveal";
+        const cls = "opt" + (reveal && i === q.correct ? " correct" : "") + (reveal && s.picked === i && i !== q.correct ? " wrong" : "");
+        return el("div", { className: cls }, el("b", { textContent: String.fromCharCode(65 + i) }), el("span", { textContent: o }));
+      }));
+      const banner = $("banner");
+      banner.textContent = E.message();
+      banner.className = "banner" + (s.phase === "open" ? " open" : s.phase === "answering" ? " ans" : "");
+      $("beginBtn").hidden = s.phase !== "ready";
+      $("beginBtn").textContent = s.how === "random" ? "▶ Mulai Giliran " + s.names[s.turn] : "🔔 Buka Buzzer";
+      $("nextBtn").hidden = s.phase !== "reveal";
+      $("skipBtn").hidden = s.phase === "reveal";
+    }
+    if (s.phase === "end") {
+      const medals = ["🥇", "🥈", "🥉"];
+      $("ranking").textContent = E.ranking().map((r) => (medals[r.rank - 1] || r.rank + ".") + " " + r.name + " — " + r.score + " poin").join("\n");
+    }
+    $("teams").replaceChildren(...E.TEAMS.map((t) => teamBox(t, c, inGame)));
+  }
+  function update() { save(); render(); broadcast(); syncMusic(); }
+
+  /* ---------- Aksi moderator ---------- */
+  function act(fn) { if (fn()) update(); }
+  function startGame() {
+    $("startErr").textContent = "";
+    const res = cleanQuestions(Qs);
+    if (res.error) { $("startErr").textContent = res.error; return; }
+    let list = settings.shuffle ? shuffled(res.list) : res.list;
+    const n = parseInt(settings.count, 10);
+    if (Number.isInteger(n) && n >= 1) list = list.slice(0, Math.min(n, list.length));
+    E.setQuestions(list); playlist = list;
+    E.setSettings({ mode: settings.mode, points: settings.points });
+    if (!E.start()) { $("startErr").textContent = "Butuh minimal 2 tim yang sudah bergabung."; return; }
+    update();
+  }
+  function bindSettings() {
+    $("setCount").value = settings.count; $("setPoints").value = settings.points;
+    $("setMode").value = settings.mode; $("setShuffle").checked = !!settings.shuffle;
+    $("setCount").addEventListener("input", () => { settings.count = $("setCount").value; save(); });
+    $("setPoints").addEventListener("input", () => { const p = parseInt($("setPoints").value, 10); settings.points = Number.isFinite(p) ? p : 10; save(); });
+    $("setMode").addEventListener("change", () => { settings.mode = $("setMode").value; save(); });
+    $("setShuffle").addEventListener("change", () => { settings.shuffle = $("setShuffle").checked; save(); });
+  }
+  function bind() {
+    $("addQ").addEventListener("click", () => { if (Qs.length < MAX_Q) { Qs.push(blankQ()); save(); renderEditor(); } });
+    $("startBtn").addEventListener("click", startGame);
+    $("beginBtn").addEventListener("click", () => act(() => {
+      const ok = E.begin();
+      if (ok && E.s.phase === "answering") playTeamSound(E.s.turn); else if (ok) beep(660, 0.2);
+      return ok;
+    }));
+    $("nextBtn").addEventListener("click", () => act(() => E.next()));
+    $("skipBtn").addEventListener("click", () => act(() => E.skip()));
+    $("againBtn").addEventListener("click", () => act(() => { E.reset(); return true; }));
+    $("musicBtn").addEventListener("click", toggleMusic);
+    $("musicBtn2").addEventListener("click", toggleMusic);
+    document.addEventListener("pointerdown", syncMusic);
+    document.addEventListener("keydown", (e) => {
+      syncMusic();
+      if (/^(TEXTAREA|INPUT|SELECT)$/.test(e.target.tagName)) return;
+      if (e.key === " " && E.s.phase === "ready") { e.preventDefault(); $("beginBtn").click(); }
+      else if (e.key === " " && E.s.phase === "reveal") { e.preventDefault(); $("nextBtn").click(); }
+    });
+    bindSettings();
+  }
+
+  /* ---------- Mulai ---------- */
+  function init() {
+    const saved = loadStore();
+    code = saved.code || randomCode();
+    Qs = sanitizeQs(saved.qs && saved.qs.length ? saved.qs : DEFAULT_QS);
+    if (saved.set) settings = Object.assign(settings, saved.set);
+    if (typeof saved.music === "boolean") musicOn = saved.music;
+    if (Array.isArray(saved.playlist) && saved.playlist.length) { playlist = saved.playlist; E.setQuestions(playlist); }
+    if (saved.snap && saved.snap.phase && saved.snap.phase !== "lobby" && playlist.length) E.restore(saved.snap);
+    renderEditor();
+    bind();
+    render();
+    syncMusic();
+    if (typeof Peer === "undefined") { $("net").textContent = "PeerJS gagal dimuat. Periksa internet."; return; }
+    startPeer();
+  }
+  init();
+})();
+</script>
+</body>
+</html>

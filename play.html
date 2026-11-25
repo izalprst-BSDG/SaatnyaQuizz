@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0f172a">
+<title>Kuis Rebutan - HP Tim</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔔</text></svg>">
+<style>
+  :root { --bg:#0f172a; --card:#1e293b; --line:#334155; --text:#f8fafc; --muted:#94a3b8; --gold:#f59e0b; --good:#22c55e; --bad:#ef4444; }
+  * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html, body { height:100%; }
+  body { margin:0; background:var(--bg); color:var(--text); font-family:system-ui,"Segoe UI",sans-serif; padding:env(safe-area-inset-top) 14px env(safe-area-inset-bottom); }
+  [hidden] { display:none !important; }
+  .wrap { max-width:520px; margin:0 auto; min-height:100%; display:flex; flex-direction:column; gap:12px; padding:12px 0 18px; }
+  h1 { font-size:1.15rem; margin:4px 0 0; text-align:center; }
+  .status { display:flex; gap:8px; align-items:center; justify-content:center; color:var(--muted); font-size:.85rem; }
+  .dot { width:10px; height:10px; border-radius:50%; background:var(--bad); } .dot.on { background:var(--good); }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:14px; }
+  input[type=text] { width:100%; font:inherit; font-size:1.2rem; padding:11px; border-radius:12px; border:1px solid var(--line); background:#0b1220; color:var(--text); }
+  #codeInput { font-size:1.8rem; letter-spacing:6px; text-align:center; text-transform:uppercase; }
+  button { font:inherit; font-weight:800; border:0; border-radius:14px; cursor:pointer; color:#fff; background:#334155; }
+  button:disabled { opacity:.35; cursor:not-allowed; }
+  .primary { width:100%; padding:14px; margin-top:12px; font-size:1.1rem; background:var(--gold); color:#1a1300; }
+  .pick { display:grid; gap:12px; margin-top:12px; }
+  .pickBtn { padding:20px; font-size:1.5rem; display:flex; align-items:center; justify-content:center; gap:14px; }
+  .pickBtn b { font-size:2.8rem; line-height:1; }
+  .A { background:linear-gradient(135deg,#e0455f,#a62a42); } .B { background:linear-gradient(135deg,#2d8cff,#1a58b8); } .C { background:linear-gradient(135deg,#16c784,#0e8a5d); }
+  .badge { text-align:center; font-weight:900; font-size:1.15rem; padding:8px; border-radius:12px; color:#fff; word-break:break-word; }
+  .row { display:flex; gap:8px; } .row button { padding:0 16px; background:var(--gold); color:#1a1300; }
+  .sec { font-weight:800; margin:0 0 8px; } .muted { color:var(--muted); font-size:.82rem; font-weight:500; }
+  .snd { display:flex; align-items:center; gap:8px; padding:9px 10px; border-radius:12px; background:#0b1220; border:2px solid var(--line); margin-top:8px; }
+  .snd.mine { border-color:var(--good); } .snd .lb { flex:1; font-weight:700; min-width:0; } .snd .lb small { display:block; color:var(--muted); font-weight:500; }
+  .snd button { padding:9px 12px; font-size:.9rem; } .snd .play { background:#475569; } .snd .choose { background:var(--gold); color:#1a1300; }
+  .snd.taken { opacity:.45; }
+  .qno { color:var(--muted); font-size:.8rem; font-weight:700; text-align:center; }
+  .question { text-align:center; font-weight:800; font-size:1.2rem; margin:4px 0 8px; }
+  .msg { text-align:center; font-weight:900; font-size:1.1rem; padding:12px; border-radius:14px; background:#0b1220; border:2px solid var(--line); }
+  .msg.mine { border-color:var(--gold); color:var(--gold); animation:pulse 1s infinite; }
+  @keyframes pulse { 50% { box-shadow:0 0 0 8px #f59e0b33; } }
+  .opts { display:grid; gap:8px; }
+  .opt { display:flex; gap:12px; align-items:center; text-align:left; padding:14px; font-size:1.05rem; background:#0b1220; border:3px solid var(--line); }
+  .opt b { color:var(--gold); font-size:1.4rem; } .opt.correct { border-color:var(--good); background:#052e16; } .opt.wrong { border-color:var(--bad); background:#450a0a; }
+  #buzz { min-height:200px; font-size:3rem; letter-spacing:2px; border-radius:28px; box-shadow:0 10px 0 #0008; transition:.06s; }
+  #buzz:active:not(:disabled) { transform:translateY(8px); box-shadow:0 2px 0 #0008; } #buzz:disabled { opacity:.3; box-shadow:none; filter:grayscale(.6); }
+  .teams { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+  .team { text-align:center; border-radius:12px; padding:8px 4px; color:#fff; font-size:.75rem; font-weight:700; border:2px solid transparent; word-break:break-word; }
+  .team .sc { font-size:1.5rem; font-weight:900; } .team.me { border-color:#fff; } .team.off { opacity:.3; } .team.turn { box-shadow:0 0 0 4px #ffffff55; }
+  .toast { position:fixed; left:14px; right:14px; bottom:calc(14px + env(safe-area-inset-bottom)); background:#7f1d1d; color:#fff; padding:12px; border-radius:12px; text-align:center; font-weight:700; z-index:9; }
+  pre { font:inherit; font-size:1.2rem; line-height:1.8; text-align:center; white-space:pre-wrap; margin:0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🔔 Kuis Rebutan Tim</h1>
+  <div class="status"><span class="dot" id="dot"></span><span id="statusText">Belum terhubung</span></div>
+
+  <section class="card" id="connectView">
+    <p style="text-align:center;color:var(--muted);margin:0 0 10px">Masukkan kode yang tampil di layar utama</p>
+    <input type="text" id="codeInput" maxlength="5" autocomplete="off" autocapitalize="characters" placeholder="KODE">
+    <button class="primary" id="connectBtn">Hubungkan</button>
+  </section>
+
+  <section class="card" id="pickView" hidden>
+    <p style="text-align:center;margin:0"><b>Pilih tim kelompokmu</b><br><span class="muted">Pilihan hanya sekali dan tidak bisa diganti.</span></p>
+    <div class="pick">
+      <button class="pickBtn A" data-team="A"><b>A</b> Tim A</button>
+      <button class="pickBtn B" data-team="B"><b>B</b> Tim B</button>
+      <button class="pickBtn C" data-team="C"><b>C</b> Tim C</button>
+    </div>
+  </section>
+
+  <section id="setupView" hidden style="display:flex;flex-direction:column;gap:12px">
+    <div class="badge" id="setupBadge"></div>
+    <div class="card">
+      <p class="sec">Nama tim <span class="muted">(bisa diubah sampai permainan dimulai)</span></p>
+      <div class="row"><input type="text" id="nameInput" maxlength="20" placeholder="Nama tim"><button id="saveName">Simpan</button></div>
+    </div>
+    <div class="card">
+      <p class="sec">Soundboard tim <span class="muted">(dengarkan dulu, lalu pilih. Hanya sekali!)</span></p>
+      <div id="sounds"></div>
+    </div>
+    <div class="msg" id="setupMsg"></div>
+  </section>
+
+  <section id="playView" hidden style="display:flex;flex-direction:column;gap:12px;flex:1">
+    <div class="badge" id="badge"></div>
+    <div class="card">
+      <div class="qno" id="qno"></div>
+      <div class="question" id="question"></div>
+      <div class="opts" id="opts"></div>
+    </div>
+    <div class="msg" id="msg"></div>
+    <button id="buzz" disabled>BUZZ!</button>
+    <div class="card" id="endBox" hidden><pre id="ranking"></pre></div>
+    <div class="teams" id="teams"></div>
+  </section>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<script>
+(() => {
+  "use strict";
+  const PREFIX = "kuis3tim-";
+  const STORE = "q3_player";
+  const RETRY_MS = 2000;
+  const PREVIEW_SECONDS = 5;
+  const TEAMS = ["A", "B", "C"];
+  const SOUNDS = [
+    { id: "bus",  label: "Klakson Bus",       file: "bus-honk-meme.mp3" },
+    { id: "raja", label: "Raja & Ratu Masuk", file: "king-queen-entrance.mp3" },
+    { id: "rizz", label: "Rizzz",             file: "the-weeknd-rizzz.mp3" },
+    { id: "bel",  label: "Bel Pintu",         file: "ring-doorbell-sound-mp3.mp3" },
+    { id: "gong", label: "Gong",              file: "shinese-gong.mp3" },
+    { id: "pipa", label: "Pipa Logam",        file: "metal-pipe-clang.mp3" },
+    { id: "hp",   label: "HP Berdering",      file: "yo-phone-is-ringing-your-phone-was-ringing.mp3" }
+  ];
+  const $ = (id) => document.getElementById(id);
+
+  let peer = null, conn = null, roomCode = "", myTeam = "", retryTimer = null, lastState = null, sentBuzz = false, sentAnswer = false;
+  let preview = null, previewTimer = null, toastTimer = null;
+
+  function setStatus(on, text) { $("dot").classList.toggle("on", on); $("statusText").textContent = text; }
+  function show(view) {
+    ["connect", "pick", "setup", "play"].forEach((v) => { $(v + "View").hidden = v !== view; });
+  }
+  function toast(text) {
+    const t = $("toast"); t.textContent = text; t.hidden = false;
+    clearTimeout(toastTimer); toastTimer = setTimeout(() => { t.hidden = true; }, 3500);
+  }
+  function loadSaved() { try { return JSON.parse(localStorage.getItem(STORE)) || {}; } catch { return {}; } }
+  function saveTeam() { try { localStorage.setItem(STORE, JSON.stringify({ code: roomCode, team: myTeam })); } catch { /* abaikan */ } }
+
+  /* ---------- Koneksi ---------- */
+  function connectToHost(raw) {
+    roomCode = String(raw || "").toUpperCase().trim();
+    if (roomCode.length < 5) return setStatus(false, "Kode harus 5 karakter");
+    const saved = loadSaved();
+    myTeam = saved.code === roomCode && TEAMS.includes(saved.team) ? saved.team : "";
+    setStatus(false, "Menghubungkan…");
+    clearTimeout(retryTimer);
+    if (peer) peer.destroy();
+    peer = new Peer();
+    peer.on("open", () => {
+      conn = peer.connect(PREFIX + roomCode, { reliable: true });
+      conn.on("open", onOpen);
+      conn.on("data", onData);
+      conn.on("close", onLost);
+      conn.on("error", onLost);
+    });
+    peer.on("error", (err) => {
+      setStatus(false, err.type === "peer-unavailable" ? "Kode tidak ditemukan. Cek layar utama." : "Gangguan: " + err.type);
+      scheduleRetry();
+    });
+  }
+  function onOpen() {
+    setStatus(true, "Terhubung ke ruangan " + roomCode);
+    if (myTeam) { send({ type: "join", team: myTeam }); showMain(); }
+    else show("pick");
+    try { navigator.wakeLock?.request("screen").catch(() => {}); } catch { /* tidak wajib */ }
+  }
+  function onLost() { setStatus(false, "Terputus. Mencoba lagi…"); scheduleRetry(); }
+  function scheduleRetry() { clearTimeout(retryTimer); retryTimer = setTimeout(() => connectToHost(roomCode), RETRY_MS); }
+  function send(msg) { if (conn && conn.open) conn.send(msg); }
+
+  /* ---------- Pilih tim (sekali) ---------- */
+  function chooseTeam(team) {
+    if (myTeam || !TEAMS.includes(team)) return;
+    if (!confirm("Pilih Tim " + team + "? Pilihan tidak bisa diganti.")) return;
+    myTeam = team; saveTeam();
+    send({ type: "join", team });
+    showMain();
+  }
+  function showMain() {
+    if (!lastState) { show("setup"); return; }
+    render(lastState);
+  }
+
+  /* ---------- Data dari host ---------- */
+  function onData(m) {
+    if (!m) return;
+    if (m.type === "notice" && m.text) { toast(m.text); return; }
+    if (m.type !== "state" || !m.s) return;
+    lastState = m.s; sentBuzz = false; sentAnswer = false;
+    if (myTeam) render(m.s);
+  }
+  function render(s) {
+    if (s.phase === "lobby") { show("setup"); renderSetup(s); }
+    else { show("play"); renderGame(s); }
+  }
+  const nameOf = (s, t) => s.names[t] || "Tim " + t;
+
+  /* ---------- Setup: nama & soundboard ---------- */
+  function stopPreview() {
+    clearTimeout(previewTimer);
+    if (preview) { try { preview.pause(); } catch { /* abaikan */ } preview = null; }
+  }
+  function playPreview(entry) {
+    stopPreview();
+    try {
+      preview = new Audio(entry.file);
+      const p = preview.play();
+      if (p && p.catch) p.catch(() => toast("Suara belum bisa diputar. Coba ketuk lagi."));
+      previewTimer = setTimeout(stopPreview, PREVIEW_SECONDS * 1000);
+    } catch { /* abaikan */ }
+  }
+  function chooseSound(entry) {
+    if (!confirm("Pilih soundboard \"" + entry.label + "\"? Pilihan tidak bisa diganti.")) return;
+    stopPreview();
+    send({ type: "sound", id: entry.id });
+  }
+  function renderSetup(s) {
+    const badge = $("setupBadge");
+    badge.textContent = "Kamu di " + nameOf(s, myTeam);
+    badge.className = "badge " + myTeam;
+    const input = $("nameInput");
+    if (document.activeElement !== input) input.value = nameOf(s, myTeam);
+
+    const mine = s.sounds[myTeam];
+    $("sounds").replaceChildren(...SOUNDS.map((entry) => {
+      const owner = TEAMS.find((t) => s.sounds[t] === entry.id);
+      const isMine = owner === myTeam;
+      const takenByOther = owner && !isMine;
+      const row = document.createElement("div");
+      row.className = "snd" + (isMine ? " mine" : "") + (takenByOther ? " taken" : "");
+      const label = document.createElement("div"); label.className = "lb";
+      label.textContent = entry.label;
+      if (isMine) { const sm = document.createElement("small"); sm.textContent = "✓ Pilihan timmu"; label.append(sm); }
+      if (takenByOther) { const sm = document.createElement("small"); sm.textContent = "Dipakai " + nameOf(s, owner); label.append(sm); }
+      const play = document.createElement("button"); play.className = "play"; play.textContent = "▶ Dengar";
+      play.addEventListener("click", () => playPreview(entry));
+      row.append(label, play);
+      if (!mine && !owner) {
+        const choose = document.createElement("button"); choose.className = "choose"; choose.textContent = "Pilih";
+        choose.addEventListener("click", () => chooseSound(entry));
+        row.append(choose);
+      }
+      return row;
+    }));
+    $("setupMsg").textContent = mine ? "✅ Soundboard terkunci. Menunggu permainan dimulai…" : "Pilih satu soundboard untuk timmu.";
+  }
+
+  /* ---------- Permainan ---------- */
+  function renderGame(s) {
+    stopPreview();
+    const badge = $("badge");
+    badge.textContent = "Kamu di " + nameOf(s, myTeam);
+    badge.className = "badge " + myTeam;
+    $("qno").textContent = s.qNum > 0 && s.phase !== "end" ? "SOAL " + s.qNum + " / " + s.total : "";
+    $("question").textContent = s.question ? s.question.q : "";
+
+    const myTurn = s.phase === "answering" && s.turn === myTeam;
+    $("opts").replaceChildren(...(s.question ? s.question.options : []).map((text, i) => {
+      const b = document.createElement("button");
+      const reveal = s.phase === "reveal";
+      b.className = "opt" + (reveal && i === s.correct ? " correct" : "") + (reveal && i === s.picked && i !== s.correct ? " wrong" : "");
+      b.disabled = !myTurn;
+      const letter = document.createElement("b"); letter.textContent = String.fromCharCode(65 + i);
+      const span = document.createElement("span"); span.textContent = text;
+      b.append(letter, span);
+      b.addEventListener("click", () => answer(i));
+      return b;
+    }));
+
+    const msg = $("msg");
+    msg.textContent = s.message;
+    msg.className = "msg" + (s.phase === "open" || myTurn ? " mine" : "");
+
+    const showBuzz = s.phase === "ready" || s.phase === "open";
+    $("buzz").hidden = !showBuzz;
+    $("buzz").className = myTeam;
+    $("buzz").disabled = s.phase !== "open";
+
+    $("endBox").hidden = s.phase !== "end";
+    if (s.phase === "end") {
+      const medals = ["🥇", "🥈", "🥉"];
+      $("ranking").textContent = s.ranking.map((r) => (medals[r.rank - 1] || r.rank + ".") + " " + r.name + " — " + r.score + " poin").join("\n");
+    }
+    $("teams").replaceChildren(...TEAMS.map((t) => {
+      const box = document.createElement("div");
+      box.className = "team " + t + (t === myTeam ? " me" : "") + (s.teams[t].registered ? "" : " off") + (s.turn === t ? " turn" : "");
+      const name = document.createElement("div"); name.textContent = nameOf(s, t);
+      const score = document.createElement("div"); score.className = "sc"; score.textContent = s.scores[t];
+      box.append(name, score);
+      return box;
+    }));
+  }
+  function press() {
+    if (sentBuzz || !lastState || lastState.phase !== "open") return;
+    sentBuzz = true;
+    $("buzz").disabled = true;
+    send({ type: "buzz" });
+    navigator.vibrate?.(60);
+  }
+  function answer(index) {
+    if (sentAnswer || !lastState || lastState.phase !== "answering" || lastState.turn !== myTeam) return;
+    sentAnswer = true;
+    document.querySelectorAll(".opt").forEach((b) => { b.disabled = true; });
+    send({ type: "answer", index });
+    navigator.vibrate?.(40);
+  }
+
+  function init() {
+    $("connectBtn").addEventListener("click", () => connectToHost($("codeInput").value));
+    $("codeInput").addEventListener("keydown", (e) => { if (e.key === "Enter") connectToHost(e.target.value); });
+    document.querySelectorAll(".pickBtn").forEach((b) => b.addEventListener("click", () => chooseTeam(b.dataset.team)));
+    $("saveName").addEventListener("click", () => {
+      const v = $("nameInput").value.trim();
+      if (!v) { toast("Nama tim tidak boleh kosong."); return; }
+      send({ type: "rename", name: v });
+      $("nameInput").blur();
+    });
+    $("nameInput").addEventListener("keydown", (e) => { if (e.key === "Enter") $("saveName").click(); });
+    $("buzz").addEventListener("pointerdown", press);
+    const fromUrl = new URLSearchParams(location.search).get("code");
+    const saved = loadSaved();
+    const initial = fromUrl || saved.code || "";
+    if (initial) { $("codeInput").value = initial.toUpperCase(); if (fromUrl) connectToHost(initial); }
+    show("connect");
+  }
+  init();
+})();
+</script>
+</body>
+</html>
